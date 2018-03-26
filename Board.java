@@ -13,10 +13,13 @@ public class Board extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private int [][] board = {{0,0,0},{0,0,0},{0,0,0}};
+	private int [] lastRow = new int [9];
+	private int [] lastCol = new int [9];
 	
 	private DrawStuff draw;
 	
 	private JButton reset;
+	private JButton previousMove;
 	
 	private JLabel xScoreLabel;
 	private JLabel oScoreLabel;
@@ -26,6 +29,7 @@ public class Board extends JPanel {
 	private JPanel boardPanel;
 	private JPanel scorePanel;
 	private JPanel buttonPanel;
+	private JPanel buttonPanel2;
 	private JPanel winnerPanel;
 	
 	private int turn;
@@ -38,6 +42,7 @@ public class Board extends JPanel {
 	
 	private DrawX x;
 	private DrawO o;
+	private CheckWinner win;
 	
 	private ArrayList <DrawX> xList;
 	private ArrayList <DrawO> oList;
@@ -47,7 +52,9 @@ public class Board extends JPanel {
 	
 	public Board() {
 		reset = new JButton("Clear the board");
+		previousMove = new JButton ("Reverse last move");
 		reset.addActionListener (new ButtonListener ());
+		previousMove.addActionListener(new PreviousListener());
 		turn = 0;
 		xScore = 0;
 		oScore = 0;
@@ -56,16 +63,19 @@ public class Board extends JPanel {
 		winner = new JLabel ("");
 		winnerPanel = new JPanel ();
 		winnerPanel.add(winner);
-		sidePanel = new JPanel(new GridLayout(3, 1));
+		sidePanel = new JPanel(new GridLayout(4, 1));
 		scorePanel = new JPanel(new GridLayout(2, 1));
 		boardPanel = new JPanel();
 		buttonPanel = new JPanel(new BorderLayout());
+		buttonPanel2 = new JPanel(new BorderLayout());
 		buttonPanel.add(reset);
+		buttonPanel2.add(previousMove);
 		scorePanel.add(xScoreLabel);
 		scorePanel.add(oScoreLabel);
 		sidePanel.add(scorePanel);
 		add(sidePanel);
 		sidePanel.add(buttonPanel);
+		//sidePanel.add(buttonPanel2);
 		sidePanel.add(winnerPanel);
 		add(boardPanel);
 		draw = new DrawStuff();
@@ -105,13 +115,13 @@ public class Board extends JPanel {
 	public class ClickListener implements MouseListener {
 		public void mouseClicked(MouseEvent e) {
 			turn++;
-			CheckWinner win = new CheckWinner (board);
+			win = new CheckWinner (board);
 			Point pt = e.getPoint();
 			xCoor = pt.x;
 			yCoor = pt.y;
 			int rowPos = 0;
 			int colPos = 0;
-						if (xCoor > 0 && xCoor < gridWidth){
+			if (xCoor > 0 && xCoor < gridWidth){
 				xCoor = gridWidth/10;
 				rowPos = 0;
 				if (yCoor > 0 && yCoor < gridHeight){
@@ -169,65 +179,70 @@ public class Board extends JPanel {
 			}
 			
 			font  = new Font ("Courier New", 1, gridHeight);
-
-			if (turn % 2 == 0){
-				o = new DrawO(xCoor, yCoor, "O", font);
-				oList.add(o);
-				board [rowPos][colPos] = 1;
+			if (win.oWinner() == false && win.xWinner() == false) {
+				if (turn % 2 == 0){
+					o = new DrawO(xCoor, yCoor, "O", font);
+					if (board [rowPos][colPos] == 0) {
+						oList.add(o);
+						board [rowPos][colPos] = 1;
+						lastRow [turn - 1] = rowPos;
+						lastCol [turn - 1] = colPos;
+					}
+				}
 				
-			}
-			
-			
-			else{
-				x = new DrawX (xCoor, yCoor, "X", font);
-				xList.add(x);
-				board [rowPos][colPos] = 2;
+				
+				else{
+					x = new DrawX (xCoor, yCoor, "X", font);
+					if (board [rowPos][colPos] == 0) {
+						xList.add(x);
+						board [rowPos][colPos] = 2;
+						lastRow [turn - 1] = rowPos;
+						lastCol [turn - 1] = colPos;
+					}
+				}
 			}
 			
 			if (turn < 9){
 				if (win.oWinner()){
 					winner.setText("O WINS");
-					oScore++;
-					oScoreLabel .setText("O: " + oScore);
 				}
 			
 				else if (win.xWinner()){
 					winner.setText("X WINS");
-					xScore++;
-					xScoreLabel .setText("X: " + xScore);
 				}
 			
 			}
 			
-			else{
-				winner.setText("IT'S A TIE");
+			else if (turn == 9){
+				if (win.oWinner()) {
+					winner.setText("O WINS");
+				}
+				
+				else if (win.xWinner()) {
+					winner.setText("X WINS");
+				}
+				
+				else {
+					winner.setText("IT'S A TIE");
+				}
+				
 			}
-			
-			
 			repaint();
 		}
 
-		@Override
 		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
-
+			
 		}
 
-		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
-
+		
 		}
 
-		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
-
+	
 		}
 
-		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
 
 		}
 
@@ -235,6 +250,15 @@ public class Board extends JPanel {
 	
 	private class ButtonListener implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
+			if (win.xWinner()) {
+				xScore++;
+				xScoreLabel .setText("X: " + xScore);
+			}
+			
+			else if (win.oWinner()) {
+				oScore++;
+				oScoreLabel .setText("O: " + oScore);
+			}
 			oList.clear();
 			xList.clear();
 			turn = 0;
@@ -246,5 +270,18 @@ public class Board extends JPanel {
 			winner.setText("");
 			repaint ();
 		}
+	}
+	
+	private class PreviousListener implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			if (turn >= 1) {
+				int rowToRemove = lastRow[turn - 1];
+				int colToRemove = lastCol[turn - 1];
+				board [rowToRemove][colToRemove] = 0;
+				turn--;	
+				repaint ();
+			}	
+		}
+		
 	}
 }

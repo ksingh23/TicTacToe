@@ -3,27 +3,19 @@ package TicTacToe;
 import java.awt.Font;
 import java.awt.Graphics;
 
-public class DrawO {
+public class DrawBlank {
 	private int x;
 	private int y;
 	private String input;
 	private Font font;
-	public DrawO (int x1, int y1, String input1, Font font1){
+	public DrawBlank (int x1, int y1, String input1, Font font1){
 		x = x1;
 		y = y1;
 		input = input1;
 		font = font1;
 	}
 	
-	public int getXCoor () {
-		return x;
-	}
-	
-	public int getYCoor () {
-		return y;
-	}
-	
-	public void drawO (Graphics page){
+	public void drawBlank (Graphics page){
 		page.setFont(font);
 		page.drawString(input, x, y);
 	}

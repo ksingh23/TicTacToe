@@ -15,6 +15,14 @@ public class DrawX {
 		input = input1;
 		font = font1;
 	}
+	
+	public int getXCoor () {
+		return x;
+	}
+	
+	public int getYCoor () {
+		return y;
+	}
 
 	public void drawX(Graphics page) {
 		page.setFont(font);
