@@ -1,5 +1,9 @@
 package TicTacToe;
 
+/*
+ * This class draws the X's using the drawString method and coordinates
+ * determined in the ClickListener class
+ */
 import java.awt.Font;
 import java.awt.Graphics;
 
@@ -16,7 +20,7 @@ public class DrawX {
 		font = font1;
 	}
 	
-	public int getXCoor () {
+	public int getXCoor () {		//Getter methods to get the x and y coordinate values for use in the reverse last move arrays
 		return x;
 	}
 	
@@ -24,7 +28,7 @@ public class DrawX {
 		return y;
 	}
 
-	public void drawX(Graphics page) {
+	public void drawX(Graphics page) {			//Draws a string "X"
 		page.setFont(font);
 		page.drawString (input, x, y);
 	}

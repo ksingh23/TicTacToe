@@ -3,6 +3,10 @@ package TicTacToe;
 import java.awt.Font;
 import java.awt.Graphics;
 
+/*
+ * This class draws the O's using the drawString method and coordinates
+ * determined in the ClickListener class
+ */
 public class DrawO {
 	private int x;
 	private int y;
@@ -15,7 +19,7 @@ public class DrawO {
 		font = font1;
 	}
 	
-	public int getXCoor () {
+	public int getXCoor () {		//Getter methods to get the x and y coordinate values for use in the reverse last move arrays
 		return x;
 	}
 	
@@ -25,6 +29,6 @@ public class DrawO {
 	
 	public void drawO (Graphics page){
 		page.setFont(font);
-		page.drawString(input, x, y);
+		page.drawString(input, x, y);			//Draws a string "O"
 	}
 }
